@@ -1,14 +1,14 @@
-// documentation ESP8266: https://www.mikrocontroller-elektronik.de/nodemcu-esp8266-tutorial-wlan-board-arduino-ide/
+// now-to ESP8266: https://www.instructables.com/Setting-Up-the-Arduino-IDE-to-Program-the-ESP8266-/
 // motorshield used: https://www.pololu.com/product/2511
 
 // libraries
+// Arduino OSC right > now we use an older version of library, see "libraries" folder repository
 #include <ArduinoOSC.h> // https://github.com/hideakitai/ArduinoOSC
-#include <Chrono.h> // https://github.com/SofaPirate/Chrono
 
 // WiFi stuff
 const char* ssid = "maschinenraum";
 const char* pwd = "maschinenraum";
-const IPAddress ip(192, 168, 1, 200);
+const IPAddress ip(192, 168, 1, 200); // set unique IP for each robot here!!!
 const IPAddress gateway(192, 168, 1, 1);
 const IPAddress subnet(255, 255, 255, 0);
 
@@ -19,13 +19,8 @@ int pinSpeed1 = D6;
 int pinSpeed2 = D5;
 
 // for ArduinoOSC
-const char* host = "192.168.1.100";
 const int recv_port = 9999;
 const int send_port = 8888;
-
-// Instanciate a chrono object.
-Chrono replyChrono;
-int timer = 16; // ms
 
 /// drive motor
 void driveMotor(int IDmotor, OscMessage m) {
@@ -48,6 +43,7 @@ void driveMotor(int IDmotor, OscMessage m) {
 
 void setup() {
 
+  // init serial
   Serial.begin(115200);
 
   // WiFi stuff
@@ -68,7 +64,7 @@ void setup() {
   analogWrite(pinSpeed2, 0);
 
   // osc messages
-  OscWiFi.subscribe(recv_port,"/motor1", [](OscMessage & m) {
+  OscWiFi.subscribe(recv_port, "/motor1", [](OscMessage & m) {
     driveMotor(0, m);
   });
   OscWiFi.subscribe(recv_port, "/motor2", [](OscMessage & m) {
@@ -79,14 +75,7 @@ void setup() {
 
 
 void loop() {
-
-  OscWiFi.parse(); // should be called
-
-
-  // check if chrono and send back whatever date via osc
-  if (replyChrono.hasPassed(timer) ) {
-    replyChrono.restart();
-    //OscWiFi.send(host, send_port, "/send", analogRead(A0)); // all x ms  
-  }
+  // should be called to parse incoming OSC messages
+  OscWiFi.parse();
 
 }
