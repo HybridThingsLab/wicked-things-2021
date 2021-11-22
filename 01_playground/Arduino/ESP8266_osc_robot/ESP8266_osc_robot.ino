@@ -8,38 +8,25 @@
 // WiFi stuff
 const char* ssid = "maschinenraum";
 const char* pwd = "maschinenraum";
-const IPAddress ip(192, 168, 1, 200); // set unique IP for each robot here!!!
+const IPAddress ip(192, 168, 1, 200); // set unique IP (last number e.g. 200) for each robot here!!!
 const IPAddress gateway(192, 168, 1, 1);
 const IPAddress subnet(255, 255, 255, 0);
 
 // pins motorshield
-int pinDir1 = D8;
-int pinDir2 = D7;
-int pinSpeed1 = D6;
-int pinSpeed2 = D5;
+int pinDir1 = D5; // 8
+int pinDir2 = D6; // 7
+int pinSpeed1 = D7; // 10
+int pinSpeed2 = D8; // 9
+
+/*
+int pinDir1 = D8; // 8
+int pinDir2 = D7; // 7
+int pinSpeed1 = D6; // 10
+int pinSpeed2 = D5; // 9*/
 
 // for ArduinoOSC
 const int recv_port = 9999;
 const int send_port = 8888;
-
-/// drive motor
-void driveMotor(int IDmotor, OscMessage m) {
-
-  Serial.print("motor: ");
-  Serial.print(IDmotor); Serial.print(" ");
-  Serial.print(m.arg<int>(0)); Serial.print(" ");
-  Serial.println(m.arg<int>(1));
-
-  // control motors
-  if (IDmotor == 0) {
-    digitalWrite(pinDir1, m.arg<int>(0)); // direction
-    analogWrite(pinSpeed1, m.arg<int>(1)); // on ESP PWM = 0-1023 instead of 0-255
-  } else {
-    digitalWrite(pinDir2, m.arg<int>(0)); // direction
-    analogWrite(pinSpeed2, m.arg<int>(1)); // on ESP PWM = 0-1023 instead of 0-255
-  }
-}
-
 
 void setup() {
 
@@ -78,4 +65,22 @@ void loop() {
   // should be called to parse incoming OSC messages
   OscWiFi.parse();
 
+}
+
+/// drive motor
+void driveMotor(int IDmotor, OscMessage m) {
+
+  Serial.print("motor: ");
+  Serial.print(IDmotor); Serial.print(" ");
+  Serial.print(m.arg<int>(0)); Serial.print(" ");
+  Serial.println(m.arg<int>(1));
+
+  // control motors
+  if (IDmotor == 0) {
+    digitalWrite(pinDir1, m.arg<int>(0)); // direction
+    analogWrite(pinSpeed1, m.arg<int>(1)); // on ESP PWM = 0-1023 instead of 0-255
+  } else {
+    digitalWrite(pinDir2, m.arg<int>(0)); // direction
+    analogWrite(pinSpeed2, m.arg<int>(1)); // on ESP PWM = 0-1023 instead of 0-255
+  }
 }
