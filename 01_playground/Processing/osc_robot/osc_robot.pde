@@ -18,7 +18,7 @@ void setup() {
   // listen to incoming messages (not needed yet)
   oscP5 = new OscP5(this, 8888);
   // send messages
-  remoteLocation = new NetAddress("192.168.1.200", 9999); // change IP HERE
+  remoteLocation = new NetAddress("192.168.1.201", 9999); // change IP HERE
 }
 
 
@@ -48,26 +48,26 @@ void keyPressed() {
   case 38:
     // forward
     // motor 1 + 2
-    controlMotor(0, 0, generalSpeed);
-    controlMotor(1, 1, generalSpeed);
-    break;
-  case 40:
-    // backward
-    // motor 1 + 2
     controlMotor(0, 1, generalSpeed);
     controlMotor(1, 0, generalSpeed);
+    break;
+  case 40:
+    // backward 
+    // motor 1 + 2
+    controlMotor(0, 0, generalSpeed);
+    controlMotor(1, 1, generalSpeed);
     break;
   case 37: 
     // left
     // motor 1 + 2
-    controlMotor(0, 1, generalSpeed);
-    controlMotor(1, 1, generalSpeed);
+    controlMotor(0, 0, generalSpeed);
+    controlMotor(1, 0, generalSpeed);
     break;
   case 39: 
     // right
     // motor 1 + 2
-    controlMotor(0, 0, generalSpeed);
-    controlMotor(1, 0, generalSpeed);
+    controlMotor(0, 1, generalSpeed);
+    controlMotor(1, 1, generalSpeed);
     break;
   case 32: 
     // space / rotate
