@@ -18,7 +18,7 @@ void setup() {
   // listen to incoming messages (not needed yet)
   oscP5 = new OscP5(this, 8888);
   // send messages
-  remoteLocation = new NetAddress("192.168.1.201", 9999); // change IP HERE
+  remoteLocation = new NetAddress("192.168.1.200", 9999); // change IP HERE
 }
 
 
