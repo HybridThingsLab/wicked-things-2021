@@ -13,17 +13,23 @@
 #define SPEED_MAX_TEST      300         // [-] Maximum speed for testing
 // #define DEBUG_RX                        // [-] Debug received data. Prints all bytes to serial (comment-out to disable)
 
+// serial output
+unsigned long lastSent = 0;
+int updateSerial = 10; // interval to send value via serial port
 
-// Install with Sketch > Include Library > Add .ZIP Library
-#include <Funken.h>
-// instantiation of Funken
-Funken fnk;
+// osc library
+#include <ArduinoOSC.h> // https://github.com/hideakitai/ArduinoOSC
 
-// debug LCD Screen
-#include <Wire.h>
-#include "rgb_lcd.h" // https://github.com/Seeed-Studio/Grove_LCD_RGB_Backlight/archive/master.zip
-// LCD Display
-rgb_lcd lcd;
+// WiFi stuff
+const char* ssid = "maschinenraum";
+const char* pwd = "maschinenraum";
+const IPAddress ip(192, 168, 1, 202); // set unique IP (last number e.g. 200) for each robot here!!!
+const IPAddress gateway(192, 168, 1, 1);
+const IPAddress subnet(255, 255, 255, 0);
+
+// for ArduinoOSC
+const int recv_port = 9999;
+const int send_port = 8888;
 
 // include ramp library, https://github.com/siteswapjuggler/RAMP
 #include <Ramp.h>
@@ -31,10 +37,6 @@ rgb_lcd lcd;
 rampInt steer_motors;
 rampInt speed_motors;
 int ramp_time = 150; // time interpolation ramp in milliseconds
-
-// software serial
-#include <SoftwareSerial.h>
-SoftwareSerial HoverSerial(2, 3);       // RX, TX
 
 // serial command
 typedef struct {
@@ -50,18 +52,22 @@ SerialCommand Command;
 void setup()
 {
 
-  // software serial
-  HoverSerial.begin(HOVER_SERIAL_BAUD);
+  // serial
+  Serial.begin(SERIAL_BAUD);
 
-  // init funken
-  fnk.begin(SERIAL_BAUD, 0, 0); // higher baudrate for better performance
-  fnk.listenTo("CONTROL", control); // however you want to name your callback
 
-  // LCD screen
-  lcd.begin(16, 2);
+  // WiFi stuff
+  WiFi.begin(ssid, pwd);
+  WiFi.config(ip, gateway, subnet);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+  }
 
-  //
-  delay(1000);
+  // osc messages
+  OscWiFi.subscribe(recv_port, "/control", [](OscMessage & m) {
+    control(m);
+  });
+
 
 
 }
@@ -76,7 +82,7 @@ void Send(int16_t uSteer, int16_t uSpeed)
   Command.checksum = (uint16_t)(Command.start ^ Command.steer ^ Command.speed);
 
   // Write to Serial
-  HoverSerial.write((uint8_t *) &Command, sizeof(Command));
+  Serial.write((uint8_t *) &Command, sizeof(Command));
 }
 
 
@@ -85,40 +91,36 @@ void Send(int16_t uSteer, int16_t uSpeed)
 
 void loop(void) {
 
-  // needed to make FUNKEN work
-  fnk.hark();
+  // should be called to parse incoming OSC messages
+  OscWiFi.parse();
 
   // update ramp
   steer_motors.update();
   speed_motors.update();
 
-  // control hoverboard (steering, speed) > -1000 to 1000
-  Send(steer_motors.getValue(), speed_motors.getValue());
+  // Do not try to send Serial stuff too often, be prevent this by checking when we sent the last time
+  if ((millis() - lastSent) > updateSerial) {
+    // control hoverboard (steering, speed) > -1000 to 1000
+    Send(steer_motors.getValue(), speed_motors.getValue());
+    // update timestamp last sent
+    lastSent = millis();
+  }
+
 
 }
 
 // ########################## END ##########################
 
-void control(char *c) {
-
-  // get first argument
-  char *token = fnk.getToken(c); // is needed for library to work properly, but can be ignored
+void control(OscMessage m) {
 
   // steer
-  int steer = atoi(fnk.getArgument(c));
+  int steer = m.arg<int>(0);
 
   // speed
-  int speed = atoi(fnk.getArgument(c));
-
-  lcd.clear();
-  lcd.setCursor(0, 0);
-  lcd.print(s teer);
-  lcd.setCursor(0, 1);
-  lcd.print(speed);
+  int speed = m.arg<int>(1);
 
   // update ramp
   steer_motors.go(steer, ramp_time);
   speed_motors.go(speed, ramp_time);
-
 
 }
