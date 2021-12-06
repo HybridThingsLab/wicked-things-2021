@@ -30,7 +30,7 @@ rgb_lcd lcd;
 // parameters ramp
 rampInt steer_motors;
 rampInt speed_motors;
-int ramp_speed = 150;
+int ramp_time = 150; // time interpolation ramp in milliseconds
 
 // software serial
 #include <SoftwareSerial.h>
@@ -92,7 +92,7 @@ void loop(void) {
   steer_motors.update();
   speed_motors.update();
 
-  // control motor
+  // control hoverboard (steering, speed) > -1000 to 1000
   Send(steer_motors.getValue(), speed_motors.getValue());
 
 }
@@ -117,8 +117,8 @@ void control(char *c) {
   lcd.print(speed);
 
   // update ramp
-  steer_motors.go(steer, ramp_speed);
-  speed_motors.go(speed, ramp_speed);
+  steer_motors.go(steer, ramp_time);
+  speed_motors.go(speed, ramp_time);
 
 
 }
