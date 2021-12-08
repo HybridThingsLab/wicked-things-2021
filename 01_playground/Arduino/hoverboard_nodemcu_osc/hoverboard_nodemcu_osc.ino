@@ -48,6 +48,11 @@ typedef struct {
 SerialCommand Command;
 
 
+//heartbeat variables
+long lastheartbeat = 0;
+#define HEARTBEAT_TIMEOUT_MS 250
+
+
 // ########################## SETUP ##########################
 void setup()
 {
@@ -66,6 +71,11 @@ void setup()
   // osc messages
   OscWiFi.subscribe(recv_port, "/control", [](OscMessage & m) {
     control(m);
+  });
+
+  //register a new OSC message for heartbeat a according function
+  OscWifi.subscribe(recv_port, "/heartbeat", [](OscMessage & m){
+    heartbeat(m);
   });
 
 
@@ -106,6 +116,11 @@ void loop(void) {
     lastSent = millis();
   }
 
+  //check if we still got a heartbeat
+  if(lastheartbeat + HEARTBEAT_TIMEOUT_MS < millis()){
+    emergencyStop();
+  }
+
 
 }
 
@@ -123,4 +138,13 @@ void control(OscMessage m) {
   steer_motors.go(steer, ramp_time);
   speed_motors.go(speed, ramp_time);
 
+}
+
+void emergencyStop(){
+  Send(0, 0);
+}
+
+//heartbeat received
+void heartbeat(OscMessage m) {
+  lastheartbeat = millis();
 }
