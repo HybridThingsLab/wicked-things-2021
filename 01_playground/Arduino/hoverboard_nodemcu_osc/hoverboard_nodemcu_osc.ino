@@ -74,7 +74,7 @@ void setup()
   });
 
   //register a new OSC message for heartbeat a according function
-  OscWifi.subscribe(recv_port, "/heartbeat", [](OscMessage & m){
+  OscWiFi.subscribe(recv_port, "/heartbeat", [](OscMessage & m){
     heartbeat(m);
   });
 

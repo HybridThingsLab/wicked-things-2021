@@ -16,8 +16,12 @@ int joystick_min_y = 250;
 int joystick_max_y = 770;
 
 // max steering and speed hoverboard
-int max_steering = 500;
+int max_steering = 300;
 int max_speed = 300;
+int steer;
+int speed;
+int mapped_px;
+int mapped_py;
 
 // serial
 Serial port;  // The serial port
@@ -30,6 +34,7 @@ public void setup() {
 
   // canvas
   size(800, 800);
+  frameRate(60);
 
   // init osc
   // listen to incoming messages (not needed yet)
@@ -57,6 +62,10 @@ public void draw() {
 
   // clear background
   background(0);
+  
+  // quick and dirty bugfix
+  steer = 0;
+  speed = 0;
 
   // get values from joystick via serial port
   // check if message received
@@ -72,6 +81,12 @@ public void draw() {
         if (values_string.length>1) {
           px = int(values_string[0]);
           py = int(values_string[1]);
+          // re-map values
+          mapped_px = int(map(px, joystick_min_x, joystick_max_x, 0, width));
+          mapped_py = int(map(py, joystick_min_y, joystick_max_y, 0, height));
+
+          steer = int(map(mapped_px, 0, width, -max_steering, max_steering));
+          speed = int(map(mapped_py, 0, height, max_speed, -max_speed));
         }
       }
     }
@@ -79,12 +94,6 @@ public void draw() {
     }
   }
 
-  // re-map values
-  int mapped_px = int(map(px, joystick_min_x, joystick_max_x, 0, width));
-  int mapped_py = int(map(py, joystick_min_y, joystick_max_y, 0, height));
-
-  int steer = int(map(mapped_px, 0, width, -max_steering, max_steering));
-  int speed = int(map(mapped_py, 0, height, max_speed, -max_speed));
 
   // show values on screen
   fill(255);
@@ -109,4 +118,10 @@ public void draw() {
   message.add(steer); // direction
   message.add(speed); // speed (0-1023)
   oscP5.send(message, remoteLocation);
+
+  // heart beat (emergency stop)
+  if (frameCount%10 == 0) {
+    message = new OscMessage("/heartbeat");
+    oscP5.send(message, remoteLocation);
+  }
 }

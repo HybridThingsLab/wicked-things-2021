@@ -15,6 +15,12 @@ ControlIO control;
 ControlDevice stick;
 float px, py;
 
+// max steering and speed hoverboard
+int max_steering = 300;
+int max_speed = 300;
+int steer;
+int speed;
+
 
 public void setup() {
 
@@ -48,8 +54,8 @@ public void getUserInput() {
   px = map(stick.getSlider("rx").getValue(), -1, 1, 0, width);
   py = map(stick.getSlider("ry").getValue(), -1, 1, 0, height);
 
-  int steer = int(map(px, 0, width, -300, 300));
-  int speed = int(map(py, 0, height, 300, -300));
+  steer = int(map(px, 0, width, -max_steering, max_steering));
+  speed = int(map(py, 0, height, max_speed, -max_speed));
 
   message = new OscMessage("/control");
   message.add(steer); // direction
@@ -64,6 +70,12 @@ public void dropShadow() {
 }
 
 public void draw() {
+
+  // quick and dirty bugfix
+  steer = 0;
+  speed = 0;
+
+
   getUserInput(); // Polling
   background(0);
   // Show position
@@ -71,4 +83,10 @@ public void draw() {
   fill(255);
   rectMode(CENTER);
   rect(px, py, 20, 20);
+
+  // heart beat (emergency stop)
+  if (frameCount%10 == 0) {
+    message = new OscMessage("/heartbeat");
+    oscP5.send(message, remoteLocation);
+  }
 }
