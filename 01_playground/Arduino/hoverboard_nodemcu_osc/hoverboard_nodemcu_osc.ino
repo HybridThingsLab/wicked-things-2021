@@ -13,9 +13,9 @@
 #define SPEED_MAX_TEST      300         // [-] Maximum speed for testing
 // #define DEBUG_RX                        // [-] Debug received data. Prints all bytes to serial (comment-out to disable)
 
-// serial output
+// intertval control hoverboard
 unsigned long lastSent = 0;
-int updateSerial = 10; // interval to send value via serial port
+int updateSent = 10; // interval to send value via serial port
 
 // osc library
 #include <ArduinoOSC.h> // https://github.com/hideakitai/ArduinoOSC
@@ -99,7 +99,7 @@ void loop(void) {
   speed_motors.update();
 
   // Do not try to send Serial stuff too often, be prevent this by checking when we sent the last time
-  if ((millis() - lastSent) > updateSerial) {
+  if ((millis() - lastSent) > updateSent) {
     // control hoverboard (steering, speed) > -1000 to 1000
     Send(steer_motors.getValue(), speed_motors.getValue());
     // update timestamp last sent
