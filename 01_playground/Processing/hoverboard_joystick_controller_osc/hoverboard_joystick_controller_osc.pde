@@ -56,6 +56,8 @@ public void getUserInput() {
 
   steer = int(map(px, 0, width, -max_steering, max_steering));
   speed = int(map(py, 0, height, max_speed, -max_speed));
+  steer = constrain(steer, -max_steering, max_steering);
+  steer = constrain(steer, -max_speed, max_speed);
 
   message = new OscMessage("/control");
   message.add(steer); // direction

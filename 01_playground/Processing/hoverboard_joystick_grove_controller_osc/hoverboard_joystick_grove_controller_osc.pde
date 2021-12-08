@@ -62,7 +62,7 @@ public void draw() {
 
   // clear background
   background(0);
-  
+
   // quick and dirty bugfix
   steer = 0;
   speed = 0;
@@ -87,6 +87,8 @@ public void draw() {
 
           steer = int(map(mapped_px, 0, width, -max_steering, max_steering));
           speed = int(map(mapped_py, 0, height, max_speed, -max_speed));
+          steer = constrain(steer, -max_steering, max_steering);
+          steer = constrain(steer, -max_speed, max_speed);
         }
       }
     }
