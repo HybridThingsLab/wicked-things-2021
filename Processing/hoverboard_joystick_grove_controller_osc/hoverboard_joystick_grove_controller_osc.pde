@@ -49,9 +49,9 @@ public void setup() {
   port = new Serial(this, Serial.list()[3], 57600);
   port.clear();
 
-  // start value px, py
-  px = joystick_min_x - joystick_max_x;
-  py = joystick_min_y - joystick_max_y;
+  // start value px, py, TODO check
+  px = joystick_max_x - joystick_min_x;
+  py = joystick_max_y - joystick_min_y;
 
   // serial
   delay(1000); // bugfix if serial not detected
@@ -77,7 +77,7 @@ public void draw() {
         // println(stringReceived);
         // split string
         values_string = stringReceived.split(" ");
-        // quick bugfix
+        // quick bugfix, ToDo CHECK again!
         if (values_string.length>1) {
           px = int(values_string[0]);
           py = int(values_string[1]);

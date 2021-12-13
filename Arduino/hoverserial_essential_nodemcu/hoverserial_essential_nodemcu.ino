@@ -4,9 +4,10 @@
 //
 //  Copyright (C) 2019-2020 Emanuel FERU <aerdronix@gmail.com>
 //
+//  how-To programm NodeMCU: https://www.instructables.com/Setting-Up-the-Arduino-IDE-to-Program-the-ESP8266-/
+//  select board: NodeMCE 1.0
 
 // ########################## DEFINES ##########################
-#define HOVER_SERIAL_BAUD   115200      // [-] Baud rate for HoverSerial (used to communicate with the hoverboard)
 #define SERIAL_BAUD         115200      // [-] Baud rate for built-in Serial (used for the Serial Monitor)
 #define START_FRAME         0xABCD       // [-] Start frme definition for reliable serial communication
 #define TIME_SEND           100         // [ms] Sending time interval
@@ -28,7 +29,6 @@ void setup()
   Serial.begin(SERIAL_BAUD);
   Serial.println("Hoverboard Serial v1.0");
 
-  pinMode(LED_BUILTIN, OUTPUT);
 }
 
 // ########################## SEND ##########################
