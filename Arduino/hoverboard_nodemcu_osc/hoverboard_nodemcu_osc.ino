@@ -20,7 +20,7 @@ int updateSent = 10; // interval to send value via serial port
 // WiFi stuff
 const char* ssid = "maschinenraum";
 const char* pwd = "maschinenraum";
-const IPAddress ip(192, 168, 1, 202); // set unique IP (last number e.g. 200) for each robot here!!!
+const IPAddress ip(192, 168, 1, 203); // set unique IP (last number e.g. 200) for each robot here!!!
 const IPAddress gateway(192, 168, 1, 1);
 const IPAddress subnet(255, 255, 255, 0);
 
