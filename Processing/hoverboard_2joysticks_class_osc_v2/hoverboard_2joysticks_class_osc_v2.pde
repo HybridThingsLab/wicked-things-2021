@@ -88,8 +88,8 @@ public void draw() {
           h1.mapped_py = int(map(h1.py, h1.joystick_min_y, h1.joystick_max_y, 0, height));
 
           //easing (value, min, max)
-          // h1.mapped_px = ease(h1.mapped_px, 0, width/2);
-          // h1.mapped_py = ease(h1.mapped_py, 0, height);
+          h1.mapped_px = ease(h1.mapped_px, 0, width/2);
+          h1.mapped_py = ease(h1.mapped_py, 0, height);
 
           h1.steer = int(map(h1.mapped_px, 0, width/2, h1.max_steering * -1, h1.max_steering));
           h1.speed = int(map(h1.mapped_py, 0, height, h1.max_speed * -1, h1.max_speed));  // *-1 vertauscht
@@ -181,10 +181,8 @@ int ease(int v, int min, int max) {
   // easing HERE
   // see different functions here https://easings.net/de
 
-  // value = 1 - pow(1 - value, 3);
-  // value =  sin((value * PI) / 2);
-  // value = sqrt(1 - pow(value - 1, 2));
-  value = 1 - (1 - value) * (1 - value);
+  // value = value < 0.5 ? 16 * value * value * value * value * value : 1 - pow(-2 * value + 2, 5) / 2; // easeInOutQuint
+  value =  value < 0.5 ? 2 * value * value : 1 - pow(-2 * value + 2, 2) / 2; // easeInOutQuad;
 
   return int(map(value, 0, 1, min, max));
 }
